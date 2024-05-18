@@ -1,60 +1,73 @@
-import org.junit.*;
-import org.openqa.selenium.JavascriptExecutor;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import java.util.*;  
-
-import java.net.URL;
-import java.net.MalformedURLException;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 
 public class FirstSeleniumTest {
-    public WebDriver driver;
-    
+
+    private final static String STEAM_USERNAME = "sqatassignment";
+    private final static String STEAM_PASSWORD = "w6n@c%#!zDhE4p";
+
+    private WebDriver driver;
+
     @Before
-    public void setup()  throws MalformedURLException  {
-        ChromeOptions options = new ChromeOptions();
-        driver = new RemoteWebDriver(new URL("http://selenium:4444/wd/hub"), options);
-        driver.manage().window().maximize();
+    public void setup() {
+        System.setProperty("webdriver.edge.driver", "C:\\WebDriver\\msedgedriver.exe");
+        EdgeOptions options = new EdgeOptions();
+        options.setPageLoadStrategy("eager");
+        this.driver = new EdgeDriver(options);
+        this.driver.manage().window().maximize();
     }
-    
+
     @Test
     public void testSearch() {
-        MainPage mainPage = new MainPage(this.driver);
-        Assert.assertTrue(mainPage.getFooterText().contains("2021 ELTE Faculty of Informatics"));
+        MainPage mainPage = this.getMainPage();
 
-        SearchResultPage searchResultPage = mainPage.search("Students");
-        String bodyText = searchResultPage.getBodyText();
-        System.out.println(bodyText);
-        Assert.assertTrue(bodyText.contains("FOUND"));
-        Assert.assertTrue(bodyText.contains("Current Students"));
+        Assert.assertEquals("Steam Community", mainPage.getPageTitle());
+        Assert.assertTrue(mainPage.getFooterText().contains("Valve Corporation"));
+
+        SearchResultPage searchResultPage = mainPage.search("Conan -iwnl-");
+        String firstResult = searchResultPage.getFirstResult();
+
+        Assert.assertTrue(firstResult.contains("VENI. VIDI. VICI."));
     }
-    
+
     @Test
-    public void testSearch2() {
-        String[] searchQueries={"something","","xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"};  
-        for(String searchQuery : searchQueries) {  
-            MainPage mainPage = new MainPage(this.driver);
-            SearchResultPage searchResultPage = mainPage.search(searchQuery);
-            String bodyText = searchResultPage.getBodyText();
-            Assert.assertTrue(bodyText.contains("FOUND"));
-        }  
-    }
-    
+    public void testLogin() {
+        ProfilePage profilePage = this.login();
 
-    
+        Assert.assertEquals("apv45009", profilePage.getPersonaName());
+    }
+
+    @Test
+    public void testLogout() {
+        ProfilePage profilePage = this.login();
+
+        Assert.assertEquals("apv45009", profilePage.getPersonaName());
+
+        MainPage mainPage = profilePage.logout();
+        Assert.assertTrue(mainPage.getFooterText().contains("Valve Corporation"));
+    }
+
     @After
     public void close() {
         if (driver != null) {
             driver.quit();
         }
+    }
+
+    private MainPage getMainPage() {
+        return new MainPage(this.driver);
+    }
+
+    private ProfilePage login() {
+        MainPage mainPage = getMainPage();
+
+        LoginPage loginPage = mainPage.clickLogin();
+        return loginPage.login(STEAM_USERNAME, STEAM_PASSWORD);
     }
 }

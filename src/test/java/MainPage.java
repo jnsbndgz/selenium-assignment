@@ -13,13 +13,13 @@ import org.openqa.selenium.NoSuchElementException;
 
 class MainPage extends PageBase {
 
-    private By footerBy = By.className("footer-block");
-    private By searchBarTogglerBy = By.xpath("//a[@class='search-bar-toggler']/i");
-    private By searchBarBy = By.name("search");
-    
+    private final By footerBy = By.xpath("//*[@id=\"footerText\"]/span");
+    private final By searchBarBy = By.xpath("//*[@id=\"SearchPlayers\"]");
+    private final By loginButtonBy = By.xpath("//*[@id=\"global_action_menu\"]/a[2]");
+
     public MainPage(WebDriver driver) {
         super(driver);
-        this.driver.get("https://www.inf.elte.hu/en/");
+        this.driver.get("https://steamcommunity.com/");
     }    
     
     public String getFooterText() {
@@ -27,9 +27,12 @@ class MainPage extends PageBase {
     }
     
     public SearchResultPage search(String searchQuery) {
-        this.waitAndReturnElement(searchBarTogglerBy).click();
-        
         this.waitAndReturnElement(searchBarBy).sendKeys(searchQuery + "\n");
         return new SearchResultPage(this.driver);
+    }
+
+    public LoginPage clickLogin() {
+        this.waitAndReturnElement(loginButtonBy).click();
+        return new LoginPage(this.driver);
     }
 }
