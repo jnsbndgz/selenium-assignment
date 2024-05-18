@@ -1,5 +1,8 @@
+package selenium.steam;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import selenium.PageBase;
 
 public class LoginPage extends PageBase {
 
