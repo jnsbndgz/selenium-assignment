@@ -5,3 +5,4 @@ bin
 gradle
 gradlew
 gradlew.bat
+app.config
