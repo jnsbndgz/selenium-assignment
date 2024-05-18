@@ -1,2 +1,7 @@
 .gradle
+.idea
 build
+bin
+gradle
+gradlew
+gradlew.bat
